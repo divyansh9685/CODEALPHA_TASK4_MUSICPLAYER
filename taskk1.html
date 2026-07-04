@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎵 Premium Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- Floating Music Notes -->
+    <div class="music-notes-container" id="musicNotes"></div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Main App -->
+    <div class="app-container page-enter">
+
+        <!-- Left: Player -->
+        <div class="player-card" id="playerCard">
+            <div class="player-header">
+                <h1><i class="fas fa-headphones"></i> Music Player</h1>
+                <div class="header-actions">
+                    <button id="themeBtn" title="Themes"><i class="fas fa-palette"></i></button>
+                    <button id="sleepBtn" title="Sleep Timer"><i class="fas fa-moon"></i></button>
+                    <button id="alarmBtn" title="Alarm"><i class="fas fa-clock"></i></button>
+                    <button id="pipBtn" title="Picture-in-Picture"><i class="fas fa-window-restore"></i></button>
+                    <button id="miniToggle" title="Mini Player"><i class="fas fa-compress"></i></button>
+                    <button id="addSongsBtn" title="Add songs"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+
+            <div class="album-art-wrapper">
+                <div class="album-art" id="albumArt">
+                    <div class="vinyl-spin"></div>
+                    <div class="art-placeholder"><i class="fas fa-music"></i></div>
+                    <div class="wave-loading" id="waveLoading">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="song-info">
+                <div class="title" id="songTitle">No song loaded</div>
+                <div class="artist" id="songArtist">—</div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-bar-wrapper" id="progressWrapper">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalDuration">0:00</span>
+                </div>
+            </div>
+
+            <div class="speed-control" id="speedControl">
+                <button data-speed="0.5">0.5x</button>
+                <button data-speed="0.75">0.75x</button>
+                <button data-speed="1.0" class="active">1x</button>
+                <button data-speed="1.25">1.25x</button>
+                <button data-speed="1.5">1.5x</button>
+                <button data-speed="2.0">2x</button>
+            </div>
+
+            <div class="controls">
+                <button id="shuffleBtn" title="Shuffle"><i class="fas fa-random"></i></button>
+                <button id="prevBtn" title="Previous"><i class="fas fa-step-backward"></i></button>
+                <button id="playBtn" class="primary" title="Play / Pause"><i class="fas fa-play"></i></button>
+                <button id="nextBtn" title="Next"><i class="fas fa-step-forward"></i></button>
+                <button id="repeatBtn" title="Repeat"><i class="fas fa-repeat"></i></button>
+            </div>
+
+            <div class="crossfade-indicator" id="crossfadeIndicator">
+                <i class="fas fa-wave-square"></i> Crossfade active
+            </div>
+
+            <div class="bottom-row">
+                <div class="volume-control">
+                    <i class="fas fa-volume-low"></i>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
+                    <span class="vol-label" id="volLabel">80%</span>
+                </div>
+                <button class="queue-toggle" id="queueToggle"><i class="fas fa-list"></i> Queue</button>
+            </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <div class="sidebar">
+            <!-- Statistics -->
+            <div class="panel">
+                <div class="panel-title"><i class="fas fa-chart-pie"></i> Statistics</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalTime">0h</div>
+                        <div class="stat-label">Total Listening</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFavoriteArtist">—</div>
+                        <div class="stat-label">Favorite Artist</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFavoriteGenre">—</div>
+                        <div class="stat-label">Favorite Genre</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statToday">0</div>
+                        <div class="stat-label">Songs Played Today</div>
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Weekly Listening</div>
+                    <div class="weekly-graph" id="weeklyGraph"></div>
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;" id="monthlyReport">
+                    Monthly: 0 songs · 0h
+                </div>
+            </div>
+
+            <!-- Queue -->
+            <div class="panel">
+                <div class="panel-title" style="justify-content:space-between;">
+                    <span><i class="fas fa-queue"></i> Queue</span>
+                    <span style="font-size:11px;font-weight:400;text-transform:none;color:var(--text-muted);" id="queueCount">0 songs</span>
+                </div>
+                <div class="queue-list" id="queueList"></div>
+                <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                    <button class="storage-actions" id="exportBtn"><i class="fas fa-file-export"></i> Export</button>
+                    <button class="storage-actions" id="importBtn"><i class="fas fa-file-import"></i> Import</button>
+                    <button class="storage-actions" id="clearQueueBtn"><i class="fas fa-trash-alt"></i> Clear</button>
+                    <button class="storage-actions" id="syncBtn"><i class="fas fa-sync"></i> Sync</button>
+                </div>
+            </div>
+
+            <!-- Theme Selector -->
+            <div class="panel" style="display:none;" id="themePanel">
+                <div class="panel-title"><i class="fas fa-palette"></i> Themes</div>
+                <div class="theme-selector" id="themeSelector">
+                    <button class="theme-btn active" data-theme="dark" style="background:#0b0b1a;"><span class="check">✓</span></button>
+                    <button class="theme-btn" data-theme="light" style="background:#f0f0f5;border-color:#ccc;"><span class="check">✓</span></button>
+                    <button class="theme-btn" data-theme="amber" style="background:#2d1a12;"><span class="check">✓</span></button>
+                    <button class="theme-btn" data-theme="emerald" style="background:#122a1a;"><span class="check">✓</span></button>
+                    <button class="theme-btn" data-theme="rose" style="background:#2d1220;"><span class="check">✓</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Player -->
+    <div class="mini-player" id="miniPlayer">
+        <div class="mini-art"><i class="fas fa-music"></i></div>
+        <div class="mini-info">
+            <div class="mini-title" id="miniTitle">No song</div>
+            <div class="mini-artist" id="miniArtist">—</div>
+        </div>
+        <div class="mini-controls">
+            <button id="miniPrev"><i class="fas fa-step-backward"></i></button>
+            <button id="miniPlay"><i class="fas fa-play"></i></button>
+            <button id="miniNext"><i class="fas fa-step-forward"></i></button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="sleepModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-moon"></i> Sleep Timer</h2>
+                <button class="modal-close" data-close="sleepModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:12px;">Stop playing after:</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="sleep-option" data-minutes="5">5 min</button>
+                    <button class="sleep-option" data-minutes="15">15 min</button>
+                    <button class="sleep-option" data-minutes="30">30 min</button>
+                    <button class="sleep-option" data-minutes="60">60 min</button>
+                    <button class="sleep-option" data-minutes="0" style="color:#f87171;">Cancel</button>
+                </div>
+                <div id="sleepStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alarmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-clock"></i> Alarm with Music</h2>
+                <button class="modal-close" data-close="alarmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Set Time</label>
+                    <input type="time" id="alarmTime" value="07:00" />
+                </div>
+                <div class="form-group">
+                    <label>Select a song</label>
+                    <select id="alarmSongSelect"><option value="">— Current song —</option></select>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button id="alarmSetBtn">Set Alarm</button>
+                    <button id="alarmCancelBtn">Cancel Alarm</button>
+                </div>
+                <div id="alarmStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept="audio/*" multiple />
+    <input type="file" id="importInput" accept=".json" style="display:none;" />
+
+    <script src="script.js"></script>
+</body>
+</html>
